@@ -105,3 +105,51 @@ window.addEventListener("DOMContentLoaded", function () {
 
   //timer end-
 });
+
+//modal start
+
+const openModalTriggers = document.querySelectorAll("[data-modal-open]");
+const closeModalTrigger = document.querySelector("[data-modal-close]");
+const modal = document.querySelector(".modal");
+
+if (!modal.matches(".hidden") && !modal.matches(".show")) {
+  modal.classList.add("hidden");
+}
+
+openModalTriggers.forEach((trigger) => {
+  trigger.addEventListener("click", () => {
+    if (modal.classList.contains("hidden")) {
+      modal.classList.remove("hidden");
+      modal.classList.add("show");
+      document.body.style.overflowY = "hidden";
+    }
+  });
+
+  //using close function
+  function closeModal() {
+    modal.classList.remove("show");
+    modal.classList.add("hidden");
+    document.body.style.overflowY = "auto";
+  }
+  closeModalTrigger.addEventListener("click", () => {
+    if (modal.classList.contains("show")) {
+      closeModal();
+    }
+  });
+
+  //using event delegation
+  modal.addEventListener("click", (e) => {
+    if (e.target && e.target.matches(".modal")) {
+      closeModal();
+    }
+  });
+
+  document.addEventListener("keydown", (e)=>{
+    if (e.key === "Escape" && modal.matches(".show")) {
+      closeModal();
+    }
+  })
+
+});
+
+// modal end
