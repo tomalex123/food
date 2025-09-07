@@ -95,6 +95,13 @@ window.addEventListener("DOMContentLoaded", function () {
       minutesElem.textContent = setZero(minutes);
       secondsElem.textContent = setZero(seconds);
 
+      // modified part for changing color of seconds
+      if (secondsElem.textContent === "00") {
+        secondsElem.style.color = "darkgreen";
+      } else {
+        secondsElem.style.color = "darkred";
+      }
+
       if (total <= 0) {
         clearInterval(timeInterval);
       }
@@ -103,44 +110,54 @@ window.addEventListener("DOMContentLoaded", function () {
 
   setClock(".timer", endTime);
 
-  //timer end-
-});
+  //timer end
 
-//modal start
+  //modal start
 
-const openModalTriggers = document.querySelectorAll("[data-modal-open]");
-const closeModalTrigger = document.querySelector("[data-modal-close]");
-const modal = document.querySelector(".modal");
+  const openModalTriggers = document.querySelectorAll("[data-modal-open]");
+  const closeModalTrigger = document.querySelector("[data-modal-close]");
+  const modal = document.querySelector(".modal");
 
-const modelTimerId = setTimeout(openModal, 60000);
+  const modelTimerId = setTimeout(openModal, 320000);
 
-//using close function
-function closeModal() {
-  modal.classList.remove("show");
-  modal.classList.add("hidden");
-  document.body.style.overflowY = "auto";
-  clearTimeout(modelTimerId);
-}
-
-//using open function
-function openModal() {
-  if (modal.classList.contains("hidden")) {
-    modal.classList.remove("hidden");
-    modal.classList.add("show");
-    document.body.style.overflowY = "hidden";
+  //using close function
+  function closeModal() {
+    modal.classList.remove("show");
+    modal.classList.add("hidden");
+    document.body.style.overflowY = "auto";
     clearTimeout(modelTimerId);
   }
-}
 
-if (!modal.matches(".hidden") && !modal.matches(".show")) {
-  modal.classList.add("hidden");
-}
-
-openModalTriggers.forEach((trigger) => {
-  trigger.addEventListener("click", () => {
+  //using open function
+  function openModal() {
     if (modal.classList.contains("hidden")) {
-      openModal();
+      modal.classList.remove("hidden");
+      modal.classList.add("show");
+      document.body.style.overflowY = "hidden";
+      clearTimeout(modelTimerId);
     }
+  }
+
+  function showModalByScroll() {
+    if (
+      window.scrollY + document.documentElement.clientHeight >=
+      document.documentElement.scrollHeight - 1
+    ) {
+      openModal();
+      window.removeEventListener("scroll", showModalByScroll);
+    }
+  }
+
+  if (!modal.matches(".hidden") && !modal.matches(".show")) {
+    modal.classList.add("hidden");
+  }
+
+  openModalTriggers.forEach((trigger) => {
+    trigger.addEventListener("click", () => {
+      if (modal.classList.contains("hidden")) {
+        openModal();
+      }
+    });
   });
 
   closeModalTrigger.addEventListener("click", () => {
@@ -162,12 +179,7 @@ openModalTriggers.forEach((trigger) => {
     }
   });
 
-  window.addEventListener("scroll", () =>{
-    if (window.scrollY + document.documentElement.clientHeight >= document.documentElement.clientHeight) {
-      openModal();
-    }
+  window.addEventListener("scroll", showModalByScroll);
 
-  })
+  // modal end
 });
-
-// modal end
