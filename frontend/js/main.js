@@ -113,19 +113,19 @@ window.addEventListener("DOMContentLoaded", function () {
   //timer end
 
   //modal start
-
+  // taking all required elements
   const openModalTriggers = document.querySelectorAll("[data-modal-open]");
   const closeModalTrigger = document.querySelector("[data-modal-close]");
   const modal = document.querySelector(".modal");
 
-  const modelTimerId = setTimeout(openModal, 320000);
+  const modalTimerId = setTimeout(openModal, 320000);
 
   //using close function
   function closeModal() {
     modal.classList.remove("show");
     modal.classList.add("hidden");
     document.body.style.overflowY = "auto";
-    clearTimeout(modelTimerId);
+    clearTimeout(modalTimerId);
   }
 
   //using open function
@@ -134,7 +134,7 @@ window.addEventListener("DOMContentLoaded", function () {
       modal.classList.remove("hidden");
       modal.classList.add("show");
       document.body.style.overflowY = "hidden";
-      clearTimeout(modelTimerId);
+      clearTimeout(modalTimerId);
     }
   }
 
@@ -168,7 +168,10 @@ window.addEventListener("DOMContentLoaded", function () {
 
   //using event delegation
   modal.addEventListener("click", (e) => {
-    if (e.target && e.target.matches(".modal")) {
+    if (
+      (e.target && e.target === modal) ||
+      e.target.getAtribute("[data-modal-close]")
+    ) {
       closeModal();
     }
   });
@@ -256,4 +259,94 @@ window.addEventListener("DOMContentLoaded", function () {
   ).render();
 
   //Menu Cards end
+
+  // forms start
+
+  // take all forms
+  const forms = document.querySelectorAll("form");
+  forms.forEach((form) => {
+    postData(form);
+  });
+
+  const MESSAGES = {
+    loading: "Загрузка...",
+    success: "Спасибо! Скоро мы с вами свяжемся",
+    failure: "Что-то пошло не так... Попробуйте еще раз",
+  };
+
+  function postData(form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const loading = document.createElement("div");
+      loading.style.cssText = `      
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 16px;
+      margin-top: 16px;`;
+      loading.innerHTML = `<img src="icons/spinner.svg" style="width: 16px;height: 16px;"/> <span>${MESSAGES.loading}</span>`;
+      form.insertAdjacentElement("beforeend", loading);
+
+      const formData = new FormData(e.target);
+
+      const request = new XMLHttpRequest();
+      request.open("POST", "http://localhost:4200/support/");
+      request.setRequestHeader("Content-Type", "application/json");
+
+      // converting formData to JSON
+
+      request.send(JSON.stringify(Object.fromEntries(formData)));
+      e.target.reset();
+
+      // request.send(formData);
+      request.addEventListener("load", (e) => {
+        if (request.status === 200) {
+          //console.log(request.response);
+          //console.log("Успех:", request.response);
+          //form.insertAdjacentHTML("beforeend", `<p>${MESSAGES.success}</p>`);
+
+          ShowResponseModal(MESSAGES.success, loading);
+        } else {
+          //console.error("Ошибка:", request.status);
+          //form.insertAdjacentHTML("beforeend", `<p>${MESSAGES.failure}</p>`);
+
+          ShowResponseModal(MESSAGES.failure, loading);
+        }
+      });
+    });
+  }
+
+  // showing modal window with response message
+  function ShowResponseModal(message, loading) {
+    loading.remove();
+    // hiding previous modal window
+    const prevModalDialog = document.querySelector(".modal__dialog");
+    prevModalDialog.classList.add("hide");
+    openModal();
+
+    // creating new modal window
+    const responseModal = document.createElement("div");
+    responseModal.classList.add("modal__dialog");
+    responseModal.innerHTML = `
+    <div class="modal__content">          
+            <div data-modal-close class="modal__close">&times;</div>
+            <div class="modal__title">
+              ${message}
+            </div>                 
+        </div>
+    `;
+    modal.append(responseModal);
+
+    const srmId = setTimeout(() => {
+      responseModal.remove();
+      prevModalDialog.classList.remove("hide");
+      prevModalDialog.classList.add("show");
+      clearTimeout(srmId);
+      closeModal();
+    }, 2500);
+  }
+
+  //forms end
 });
