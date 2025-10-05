@@ -350,20 +350,125 @@ window.addEventListener("DOMContentLoaded", function () {
 
   //forms end
 
-
   //slider start
-    
+
   // slider
   const slides = document.querySelectorAll(".offer__slide");
   const prevBtn = document.querySelector(".offer__slider-prev");
   const nextBtn = document.querySelector(".offer__slider-next");
   const total = document.querySelector("#total");
   const current = document.querySelector("#current");
+  const slidesWrapper = document.querySelector(".offer__slider-wrapper");
+  const slidesInner = document.querySelector(".offer__slider-inner"); // for moving slides
 
+  let slideIndex = 1; // for showing current slide
+  let baseoffset = 0; // for moving slides
+  const wrapperWidth = parseFloat(window.getComputedStyle(slidesWrapper).width); // getting width of slidesWrapper with px
+
+  // slider NEW version START
+
+  // setting current and total numbers
+  function mathCurrentAndTotal(state) {
+    switch (state) {
+      case "next":
+        if (slideIndex == slides.length) {
+          slideIndex = 1;
+        } else {
+          ++slideIndex;
+        }
+        break;
+      case "prev":
+        if (slideIndex == 1) {
+          slideIndex = slides.length;
+        } else {
+          --slideIndex;
+        }
+        break;
+      default:
+        console.log("ERROR");
+        break;
+    }
+  }
+
+  function setCurrentAndTotal(block, index) {
+    // обновления счётчика
+    if (slides.length < 10) {
+      block.textContent = `0${index}`;
+    } else {
+      block.textContent = index;
+    }
+  }
+  setCurrentAndTotal(total, slides.length);
+  setCurrentAndTotal(current, slideIndex);
+
+  slidesWrapper.style.overflow = "hidden";
+  slidesInner.style.cssText = `
+    width: ${100 * slides.length}%;
+    display: flex;
+    transition: 0.5s all ease;
+    `;
+
+  slides.forEach((slide) => (slide.style.width = wrapperWidth)); // setting width for each slide
+
+  //Next button handler — advance one slide (wrap to first at end)
+  nextBtn.addEventListener("click", () => {
+    if (baseoffset == wrapperWidth * (slides.length - 1)) {
+      baseoffset = 0; // first slide
+    } else {
+      baseoffset += wrapperWidth;
+    }
+    mathCurrentAndTotal("next"); // updating current slide number (slideIndex = 1 → baseoffset = 0 → translateX(0) → first slide visible)
+    setCurrentAndTotal(current, slideIndex); // обновления счётчика
+    slidesInner.style.transform = `translateX(-${baseoffset}px)`; // функция показа нужного слайда
+  });
+
+  //Prev button handler — go back one slide (wrap to last from first)
+  prevBtn.addEventListener("click", () => {
+    if (baseoffset == 0) {
+      baseoffset = wrapperWidth * (slides.length - 1); // last slide
+    } else {
+      baseoffset -= wrapperWidth;
+    }
+    mathCurrentAndTotal("prev"); // updating current slide number (slideIndex = 1 → baseoffset = 0 → translateX(0) → first slide visible)
+    setCurrentAndTotal(current, slideIndex); // обновления счётчика
+    slidesInner.style.transform = `translateX(-${baseoffset}px)`; // функция показа нужного слайда
+  });
+
+  // mathCurrentAndTotal(total, slides.length);
+  // mathCurrentAndTotal(current, slideIndex);
+
+  /*
+  // initial setting of current and total
+  function test(state) {
+    switch (state) {
+      case "next":
+        if (baseoffset == wrapperWidth * (slides.length - 1)) {
+          baseoffset = 0; // first slide
+        } else {
+          baseoffset += wrapperWidth;
+        }
+        break;
+      case "prev":
+        if (baseoffset == 0) {
+          baseoffset = wrapperWidth * (slides.length - 1); // last slide
+        } else {
+          baseoffset -= wrapperWidth;
+        }
+        break;
+
+      default:
+        "error state";
+        break;
+    }
+    slidesInner.style.transform = `translateX(-${baseoffset}px)`;
+  }
+  */
+  // slider NEW version END
+
+  // slider OLD version
+  /*
   let slideIndex = 1;
-
-  //total.textContent = slides.length < 10 ? `0${slides.length}` : slides.length;
-
+  // setting current and total numbers
   function setCurrentAndTotal(block,index) {
     if (slides.length < 10) {     
       block.textContent = `0${index}`;
@@ -387,21 +492,21 @@ window.addEventListener("DOMContentLoaded", function () {
       slide.classList.add("hide");
       slide.classList.remove("show" ,"fade");
     });
+    // show current slide
     slides[slideIndex - 1].classList.remove("hide");
     slides[slideIndex - 1].classList.add("show", "fade");   
     
-    setCurrentAndTotal(current,slideIndex);
-
-    // current.textContent = slideIndex < 10 ? `0${slideIndex}` : slideIndex;
-    // total.textContent = slides.length < 10 ? `0${slides.length}` : slides.length;
+    setCurrentAndTotal(current,slideIndex);    
   }
   // initial call
   function changeSlidesN(n) {
     showSlides((slideIndex += n));
   }
-
   changeSlidesN(0)
+
+  // initial setting of current and total
   setCurrentAndTotal(total,slides.length);
+
   // showSlides(slideIndex);
   prevBtn.addEventListener("click", () => {
     changeSlidesN(-1);
@@ -411,7 +516,6 @@ window.addEventListener("DOMContentLoaded", function () {
   });
 
 setZero(n)
-
-//slider end
-
+*/
+  //slider OLD version end
 });
