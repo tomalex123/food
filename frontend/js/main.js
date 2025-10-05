@@ -352,7 +352,8 @@ window.addEventListener("DOMContentLoaded", function () {
 
   //slider start
 
-  // slider
+  // sliders
+  const sliderParent = document.querySelector(".offer__slider");
   const slides = document.querySelectorAll(".offer__slide");
   const prevBtn = document.querySelector(".offer__slider-prev");
   const nextBtn = document.querySelector(".offer__slider-next");
@@ -368,6 +369,77 @@ window.addEventListener("DOMContentLoaded", function () {
   // slider NEW version START
 
   // setting current and total numbers
+  setCurrentAndTotal(total, slides.length);
+  setCurrentAndTotal(current, slideIndex);
+
+  slidesWrapper.style.overflow = "hidden";
+  slidesInner.style.cssText = `
+    width: ${100 * slides.length}%;
+    display: flex;
+    transition: 0.5s all ease;
+    `;
+
+  slides.forEach((slide) => (slide.style.width = wrapperWidth)); // setting width for each slide
+
+  // creating dot elements
+  sliderParent.style.position = "relative";
+  const dotsWrapper = document.createElement("ul");
+  dotsWrapper.classList.add("dots__wrapper");
+
+  const dots = [];
+
+  sliderParent.append(dotsWrapper);
+
+  for (let i = 0; i < slides.length; i++) {
+    const dot = document.createElement("li");
+    dot.classList.add("dot");
+    dot.setAttribute("data-slide-to", i + 1);
+    if (i == 0) {
+      dot.classList.add("active__dot");
+    }
+    dotsWrapper.append(dot);
+    dots.push(dot);
+  }
+
+  //Next button handler — advance one slide (wrap to first at end)
+  nextBtn.addEventListener("click", () => {
+    if (baseoffset == wrapperWidth * (slides.length - 1)) {
+      baseoffset = 0; // first slide
+    } else {
+      baseoffset += wrapperWidth;
+    }
+    mathCurrentAndTotal("next"); // updating current slide number (slideIndex = 1 → baseoffset = 0 → translateX(0) → first slide visible)
+    setCurrentAndTotal(current, slideIndex); // обновления счётчика
+    setSliderTransform(); // функция показа нужного слайда
+    setActiveDot();
+  });
+
+  //Prev button handler — go back one slide (wrap to last from first)
+  prevBtn.addEventListener("click", () => {
+    if (baseoffset == 0) {
+      baseoffset = wrapperWidth * (slides.length - 1); // last slide
+    } else {
+      baseoffset -= wrapperWidth;
+    }
+    mathCurrentAndTotal("prev"); // updating current slide number (slideIndex = 1 → baseoffset = 0 → translateX(0) → first slide visible)
+    setCurrentAndTotal(current, slideIndex); // обновления счётчика
+    setSliderTransform(); // функция показа нужного слайда
+    setActiveDot();
+  });
+
+  // activate dots
+  dots.forEach((dot) => {
+    dot.addEventListener("click", (e) => {
+      const slideTo = parseInt(e.target.dataset.slideTo);
+      slideIndex = slideTo;
+      baseoffset = wrapperWidth * (slideTo - 1);
+      setSliderTransform();
+      setActiveDot();
+      setCurrentAndTotal(current, slideIndex);
+    });
+  });
+
+  // function setting current numbers of slideIndex
   function mathCurrentAndTotal(state) {
     switch (state) {
       case "next":
@@ -398,41 +470,17 @@ window.addEventListener("DOMContentLoaded", function () {
       block.textContent = index;
     }
   }
-  setCurrentAndTotal(total, slides.length);
-  setCurrentAndTotal(current, slideIndex);
 
-  slidesWrapper.style.overflow = "hidden";
-  slidesInner.style.cssText = `
-    width: ${100 * slides.length}%;
-    display: flex;
-    transition: 0.5s all ease;
-    `;
+  // remove - add active__dot
+  function setActiveDot() {
+    dots.forEach((dot) => dot.classList.remove("active__dot"));
+    dots[slideIndex - 1].classList.add("active__dot");
+  }
 
-  slides.forEach((slide) => (slide.style.width = wrapperWidth)); // setting width for each slide
-
-  //Next button handler — advance one slide (wrap to first at end)
-  nextBtn.addEventListener("click", () => {
-    if (baseoffset == wrapperWidth * (slides.length - 1)) {
-      baseoffset = 0; // first slide
-    } else {
-      baseoffset += wrapperWidth;
-    }
-    mathCurrentAndTotal("next"); // updating current slide number (slideIndex = 1 → baseoffset = 0 → translateX(0) → first slide visible)
-    setCurrentAndTotal(current, slideIndex); // обновления счётчика
-    slidesInner.style.transform = `translateX(-${baseoffset}px)`; // функция показа нужного слайда
-  });
-
-  //Prev button handler — go back one slide (wrap to last from first)
-  prevBtn.addEventListener("click", () => {
-    if (baseoffset == 0) {
-      baseoffset = wrapperWidth * (slides.length - 1); // last slide
-    } else {
-      baseoffset -= wrapperWidth;
-    }
-    mathCurrentAndTotal("prev"); // updating current slide number (slideIndex = 1 → baseoffset = 0 → translateX(0) → first slide visible)
-    setCurrentAndTotal(current, slideIndex); // обновления счётчика
-    slidesInner.style.transform = `translateX(-${baseoffset}px)`; // функция показа нужного слайда
-  });
+  // функция показа нужного слайда
+  function setSliderTransform() {
+    slidesInner.style.transform = `translateX(-${baseoffset}px)`;
+  }
 
   /*
   setInterval(() => {
