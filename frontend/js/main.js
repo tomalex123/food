@@ -434,6 +434,19 @@ window.addEventListener("DOMContentLoaded", function () {
     slidesInner.style.transform = `translateX(-${baseoffset}px)`; // функция показа нужного слайда
   });
 
+  /*
+  setInterval(() => {
+    if (slideIndex === slides.length) {
+      slideIndex = 1;
+      baseoffset = 0;
+    } else {
+      slideIndex++;
+      baseoffset += wrapperWidth;
+    }
+    slidesInner.style.transform = `translateX(-${baseoffset}px)`; // функция показа нужного слайда
+    setCurrentAndTotal(current, slideIndex); // обновления счётчика
+  }, 3000);
+  */
   // mathCurrentAndTotal(total, slides.length);
   // mathCurrentAndTotal(current, slideIndex);
 
