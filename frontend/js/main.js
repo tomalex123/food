@@ -353,13 +353,14 @@ window.addEventListener("DOMContentLoaded", function () {
   //slider start
 
   // sliders
-  const sliderParent = document.querySelector(".offer__slider");
-  const slides = document.querySelectorAll(".offer__slide");
-  const prevBtn = document.querySelector(".offer__slider-prev");
-  const nextBtn = document.querySelector(".offer__slider-next");
-  const total = document.querySelector("#total");
-  const current = document.querySelector("#current");
-  const slidesWrapper = document.querySelector(".offer__slider-wrapper");
+  const sliderParent = document.querySelector(".offer__slider"); // main parent of slider
+  // taking all required elements
+  const slides = document.querySelectorAll(".offer__slide"); // slides
+  const prevBtn = document.querySelector(".offer__slider-prev"); // buttons
+  const nextBtn = document.querySelector(".offer__slider-next"); // buttons
+  const total = document.querySelector("#total"); // for showing total number of slides
+  const current = document.querySelector("#current"); // for showing current slide number
+  const slidesWrapper = document.querySelector(".offer__slider-wrapper"); // for hiding overflow
   const slidesInner = document.querySelector(".offer__slider-inner"); // for moving slides
 
   let slideIndex = 1; // for showing current slide
@@ -372,6 +373,7 @@ window.addEventListener("DOMContentLoaded", function () {
   setCurrentAndTotal(total, slides.length);
   setCurrentAndTotal(current, slideIndex);
 
+  // setting required styles
   slidesWrapper.style.overflow = "hidden";
   slidesInner.style.cssText = `
     width: ${100 * slides.length}%;
@@ -390,6 +392,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
   sliderParent.append(dotsWrapper);
 
+  // creating dots based on number of slides
   for (let i = 0; i < slides.length; i++) {
     const dot = document.createElement("li");
     dot.classList.add("dot");
@@ -411,7 +414,7 @@ window.addEventListener("DOMContentLoaded", function () {
     mathCurrentAndTotal("next"); // updating current slide number (slideIndex = 1 → baseoffset = 0 → translateX(0) → first slide visible)
     setCurrentAndTotal(current, slideIndex); // обновления счётчика
     setSliderTransform(); // функция показа нужного слайда
-    setActiveDot();
+    setActiveDot(); // setting active dot
   });
 
   //Prev button handler — go back one slide (wrap to last from first)
@@ -424,7 +427,7 @@ window.addEventListener("DOMContentLoaded", function () {
     mathCurrentAndTotal("prev"); // updating current slide number (slideIndex = 1 → baseoffset = 0 → translateX(0) → first slide visible)
     setCurrentAndTotal(current, slideIndex); // обновления счётчика
     setSliderTransform(); // функция показа нужного слайда
-    setActiveDot();
+    setActiveDot(); // setting active dot
   });
 
   // activate dots
@@ -482,6 +485,123 @@ window.addEventListener("DOMContentLoaded", function () {
     slidesInner.style.transform = `translateX(-${baseoffset}px)`;
   }
 
+  // global functions
+
+  /*
+  // post request
+  async function postData(url, data) {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: data,
+    });
+
+    // return await res.json();
+    return res;
+  }
+
+  // get request
+  async function getData(url) {
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`Не удалось получить ${url}, статус - ${res.status}`);
+    }
+
+    return await res.json();
+  }
+
+  // global functions end
+
+*/
+  // Calorie calculator start
+
+  const calculatingResult = document.querySelector(".calculating__result span"); // block for showing result
+
+  // default values
+
+  let gender, height, weight, age, pac; // pac - physical activity coefficient
+
+  // checking local storage for gender
+  function calculatingTotal() {
+    if (!gender || !height || !weight || !age || !pac) {
+      calculatingResult.textContent = "Сначала введите все данные...";
+      return;
+    }
+
+    switch (gender) {
+      case "female":
+        calculatingResult.textContent = Math.round(
+          (10 * weight + 6.25 * height - 5 * age - 161) * pac
+        );
+        break;
+      case "male":
+        calculatingResult.textContent = Math.round(
+          (10 * weight + 6.25 * height - 5 * age + 5) * pac
+        );
+        break;
+      default:
+        text = "No value found";
+        break;
+    }
+  }
+
+  // getting static information
+  function getStaticInformation(parentSelector, activeClass) {
+    const elements = document.querySelectorAll(`${parentSelector} div`); // taking all divs inside parent, dinamic part
+    document.querySelector(parentSelector).addEventListener("click", (e) => {
+      if (e.target.dataset.pac) {
+        pac = parseFloat(e.target.dataset.pac);
+      }
+
+      if (e.target.dataset.gender) {
+        gender = e.target.dataset.gender;
+      }
+      elements.forEach((elem) => {
+        elem.classList.remove(activeClass); // removing active class from all elements
+      });
+      if (e.target.dataset.gender || e.target.dataset.pac) {
+        e.target.classList.add(activeClass); // adding active class to clicked element
+      }
+      calculatingTotal();
+    });
+  }
+
+  // getting dinamic information
+  function getDinamicInformation(selector) {
+    const input = document.querySelector(selector);
+    input.addEventListener("input", (e) => {
+      switch (e.target.id) {
+        case "height":
+          height = parseFloat(e.target.value);
+          break;
+        case "weight":
+          weight = parseFloat(e.target.value);
+          break;
+        case "age":
+          age = parseFloat(e.target.value);
+          break;
+        default:
+          text = "No value found";
+          break;
+      }
+      calculatingTotal();
+    });
+  }
+
+  getStaticInformation("#gender", "calculating__choose-item_active");
+  getStaticInformation(
+    ".calculating__choose_big",
+    "calculating__choose-item_active"
+  );
+  getDinamicInformation("#height");
+  getDinamicInformation("#weight");
+  getDinamicInformation("#age");
+
+  // Calorie calculator end
+
   /*
   setInterval(() => {
     if (slideIndex === slides.length) {
@@ -493,8 +613,12 @@ window.addEventListener("DOMContentLoaded", function () {
     }
     slidesInner.style.transform = `translateX(-${baseoffset}px)`; // функция показа нужного слайда
     setCurrentAndTotal(current, slideIndex); // обновления счётчика
-  }, 3000);
+  }, 3000); 
+
   */
+
+  //slider NEW version END
+
   // mathCurrentAndTotal(total, slides.length);
   // mathCurrentAndTotal(current, slideIndex);
 
