@@ -486,7 +486,6 @@ window.addEventListener("DOMContentLoaded", function () {
   }
 
   // global functions
-
   /*
   // post request
   async function postData(url, data) {
@@ -514,15 +513,163 @@ window.addEventListener("DOMContentLoaded", function () {
   }
 
   // global functions end
+  */
 
-*/
+
   // Calorie calculator start
-
   const calculatingResult = document.querySelector(".calculating__result span"); // block for showing result
 
   // default values
-
   let gender, height, weight, age, pac; // pac - physical activity coefficient
+
+  // getStaticInformationFromLS(gender, "gender", "female");
+  // getStaticInformationFromLS(pac, "pac", 1.375);
+
+  // getDynamicInformationFromLS("#height", height, "height", 178);
+  // getDynamicInformationFromLS("#weight", weight, "weight", 75);
+  // getDynamicInformationFromLS("#age", age, "age", 25);
+
+  initLocalSettings("#gender div", "calculating__choose-item_active");
+  initLocalSettings(".calculating__choose_big div","calculating__choose-item_active");
+
+  getStaticInformation("#gender div", "calculating__choose-item_active");
+  getStaticInformation(".calculating__choose_big div","calculating__choose-item_active");
+
+  getDinamicInformation("#height");
+  getDinamicInformation("#weight");
+  getDinamicInformation("#age");
+
+  const state = {
+    gender: "",
+    pac: "",
+    height: "",
+    weight: "",
+    age: ""   
+  };
+  
+  getStaticInformationFromLS("gender", "female");
+  getStaticInformationFromLS("pac", 1.375);                                                                                                                                                                                 
+  getDynamicInformationFromLS("height", 178,"#height");
+  getDynamicInformationFromLS("weight", 75,"#weight");
+  getDynamicInformationFromLS("age", 25,"#age");  
+
+  gender = state.gender;                                                                                                                                                                                  
+  pac = state.pac; 
+  height = state.height;
+  weight = state.weight;
+  age = state.age;    
+
+  // // checking local storage for gender
+  //     if (localStorage.getItem("gender")) {
+  //       gender = localStorage.getItem("gender");
+  //     } else {
+  //       gender = "female";
+  //       localStorage.setItem("gender", gender);
+  //     };
+
+    // // checking local storage for pac
+    // if (localStorage.getItem("pac")) {
+    //   pac = localStorage.getItem("pac");
+    // } else {
+    //   pac = 1.375;
+    //   localStorage.setItem("pac", pac);
+    // };
+
+    // // checking local storage for height
+    // if (localStorage.getItem("height")) {
+    //   height = localStorage.getItem("height");
+    //   document.querySelector("#height").value = parseFloat(height);
+    // } else {
+    //   height = 178;
+    //   document.querySelector("#height").value = parseFloat(height);
+    //   localStorage.setItem("height", height);
+    // }
+      
+    // // checking local storage for weight
+    // if (localStorage.getItem("weight")) {
+    //   weight = localStorage.getItem("weight");
+    //   document.querySelector("#weight").value = parseFloat(weight);
+    // } else {
+    //   weight = 75;
+    //   document.querySelector("#weight").value = parseFloat(weight);
+    //   localStorage.setItem("weight", weight);
+    // }
+   
+    // // checking local storage for age
+    // if (localStorage.getItem("age")) {
+    //   age = localStorage.getItem("age");
+    //   document.querySelector("#age").value = parseFloat(age);
+    // } else {
+    //   weight = 75;
+    //   document.querySelector("#weight").value = parseFloat(weight);
+    //   localStorage.setItem("weight", weight);
+    // }
+
+
+  // checking local storage
+  // function getStaticInformationFromLS(initVar, key, defaultValue) {
+  //   // checking local storage for gender, height, weight, age, pac
+  //   if (localStorage.getItem(key)) {
+  //     initVar = localStorage.getItem(key);
+  //   } else {
+  //     initVar = defaultValue;
+  //     localStorage.setItem(key, initVar);
+  //   }
+  // }
+
+  // // checking local storage
+  // function getDynamicInformationFromLS(selector, initVar, key, defaultValue) {
+  //   // checking local storage for gender, height, weight, age, pac
+  //   const elem = document.querySelector(selector);
+  //   if (localStorage.getItem(key)) {
+  //     initVar = localStorage.getItem(key);
+  //     elem.value = parseFloat(initVar);
+  //   } else {
+  //     initVar = defaultValue;
+  //     elem.value = parseFloat(initVar);
+  //     localStorage.setItem(key, initVar);
+  //   }
+  // }
+
+
+   function getStaticInformationFromLS(key, defaultValue) {    
+    // checking local storage
+    if (localStorage.getItem(key)) {
+        state[key] = localStorage.getItem(key);
+      } else {
+        state[key] = defaultValue;
+        localStorage.setItem(key, defaultValue);
+      };
+  }
+
+  function getDynamicInformationFromLS(key, defaultValue,selector) {
+    // checking local storage for height
+    if (localStorage.getItem(key)) {
+      state[key] = localStorage.getItem(key);
+      document.querySelector(selector).value = state[key];
+    } else {
+      state[key] = defaultValue;
+      document.querySelector(selector).value = parseFloat(defaultValue);
+      localStorage.setItem(key, defaultValue);
+    }
+  }
+
+  // setting active class based on local storage
+  function initLocalSettings(selector, activeClass) {
+    const elements = document.querySelectorAll(selector);
+
+    elements.forEach((elem) => {
+      elem.classList.remove(activeClass);
+
+      if (elem.dataset.gender === localStorage.getItem("gender")) {
+        elem.classList.add(activeClass);
+      }
+
+      if (elem.dataset.pac === localStorage.getItem("pac")) {
+        elem.classList.add(activeClass);
+      }
+    });
+  }
 
   // checking local storage for gender
   function calculatingTotal() {
@@ -533,72 +680,94 @@ window.addEventListener("DOMContentLoaded", function () {
 
     switch (gender) {
       case "female":
-        calculatingResult.textContent = Math.round(
-          (10 * weight + 6.25 * height - 5 * age - 161) * pac
-        );
+        calculatingResult.textContent = 
+        Math.round(((10 * weight) + (6.25 * height) - (5 * age) - 161) * pac);
         break;
       case "male":
-        calculatingResult.textContent = Math.round(
-          (10 * weight + 6.25 * height - 5 * age + 5) * pac
-        );
-        break;
-      default:
-        text = "No value found";
-        break;
+        calculatingResult.textContent = 
+        Math.round(((10 * weight) + (6.25 * height) - (5 * age) + 5) * pac);
+      // default:
+      //   text = "No value found";
+      //   break;
     }
   }
 
-  // getting static information
-  function getStaticInformation(parentSelector, activeClass) {
-    const elements = document.querySelectorAll(`${parentSelector} div`); // taking all divs inside parent, dinamic part
-    document.querySelector(parentSelector).addEventListener("click", (e) => {
-      if (e.target.dataset.pac) {
-        pac = parseFloat(e.target.dataset.pac);
-      }
+  // getting static information (gender and pac)
+  function getStaticInformation(selector, activeClass) {
+    const elements = document.querySelectorAll(selector); // taking all divs inside parent, dinamic part
 
-      if (e.target.dataset.gender) {
-        gender = e.target.dataset.gender;
-      }
-      elements.forEach((elem) => {
-        elem.classList.remove(activeClass); // removing active class from all elements
-      });
-      if (e.target.dataset.gender || e.target.dataset.pac) {
+    elements.forEach((elem) => {
+      elem.addEventListener("click", (e) => {
+        if (e.target.dataset.pac) {
+          pac = parseFloat(e.target.dataset.pac);
+          localStorage.setItem("pac", pac);
+        }
+        
+        if (e.target.dataset.gender) {
+          gender = e.target.dataset.gender;
+          localStorage.setItem("gender", gender);
+        }
+
+        elements.forEach((elem) => {
+          elem.classList.remove(activeClass); // removing active class from all elements
+        });
         e.target.classList.add(activeClass); // adding active class to clicked element
-      }
-      calculatingTotal();
+        calculatingTotal();
+      });
     });
   }
+  // document.querySelector(parentSelector).addEventListener("click", (e) => {
+  //   if (e.target.dataset.pac) {
+  //     pac = parseFloat(e.target.dataset.pac);
+  //   }
+
+  //   if (e.target.dataset.gender) {
+  //     gender = e.target.dataset.gender;
+  //   }
+  //   elements.forEach((elem) => {
+  //     elem.classList.remove(activeClass); // removing active class from all elements
+  //   });
+  //   if (e.target.dataset.gender || e.target.dataset.pac) {
+  //     e.target.classList.add(activeClass); // adding active class to clicked element
+  //   }
+  //   calculatingTotal();
+  // });
 
   // getting dinamic information
+
+  //
+  
+  
+  // getting dinamic information (height, weight, age)
   function getDinamicInformation(selector) {
     const input = document.querySelector(selector);
     input.addEventListener("input", (e) => {
+      if (input.value.match(/\D/g)) {
+        input.style.border = "2px solid #ff00008c";
+      } else {
+        input.removeAttribute("style");
+        calculatingResult.textContent = " "; // clearing result if it was shown before
+      }
       switch (e.target.id) {
         case "height":
           height = parseFloat(e.target.value);
+          localStorage.setItem("height", height);
           break;
         case "weight":
           weight = parseFloat(e.target.value);
+          localStorage.setItem("weight", weight);
           break;
         case "age":
           age = parseFloat(e.target.value);
+          localStorage.setItem("age", age);
           break;
-        default:
-          text = "No value found";
-          break;
+        // default:
+        //   text = "No value found";
+        //   break;
       }
       calculatingTotal();
     });
   }
-
-  getStaticInformation("#gender", "calculating__choose-item_active");
-  getStaticInformation(
-    ".calculating__choose_big",
-    "calculating__choose-item_active"
-  );
-  getDinamicInformation("#height");
-  getDinamicInformation("#weight");
-  getDinamicInformation("#age");
 
   // Calorie calculator end
 
@@ -613,9 +782,9 @@ window.addEventListener("DOMContentLoaded", function () {
     }
     slidesInner.style.transform = `translateX(-${baseoffset}px)`; // функция показа нужного слайда
     setCurrentAndTotal(current, slideIndex); // обновления счётчика
+    setActiveDot(); // setting active dot
   }, 3000); 
-
-  */
+*/
 
   //slider NEW version END
 
@@ -651,56 +820,56 @@ window.addEventListener("DOMContentLoaded", function () {
   // slider NEW version END
 
   // slider OLD version
-  /*
-  let slideIndex = 1;
-  // setting current and total numbers
-  function setCurrentAndTotal(block,index) {
-    if (slides.length < 10) {     
-      block.textContent = `0${index}`;
-    } else {
-      block.textContent = index;
-    }
-  }
 
-  // showSlides(slideIndex);
-  function showSlides(n) {
-    console.log(slides);
-    if (n > slides.length) {
-      slideIndex = 1;
-    }
-    if (n < 1) {
-      slideIndex = slides.length;
-    }
+  //   let slideIndex = 1;
+  //   // setting current and total numbers
+  //   function setCurrentAndTotal(block,index) {
+  //     if (slides.length < 10) {
+  //       block.textContent = `0${index}`;
+  //     } else {
+  //       block.textContent = index;
+  //     }
+  //   }
 
-    // hide all slides
-    slides.forEach((slide) => {      
-      slide.classList.add("hide");
-      slide.classList.remove("show" ,"fade");
-    });
-    // show current slide
-    slides[slideIndex - 1].classList.remove("hide");
-    slides[slideIndex - 1].classList.add("show", "fade");   
-    
-    setCurrentAndTotal(current,slideIndex);    
-  }
-  // initial call
-  function changeSlidesN(n) {
-    showSlides((slideIndex += n));
-  }
-  changeSlidesN(0)
+  //   // showSlides(slideIndex);
+  //   function showSlides(n) {
+  //     console.log(slides);
+  //     if (n > slides.length) {
+  //       slideIndex = 1;
+  //     }
+  //     if (n < 1) {
+  //       slideIndex = slides.length;
+  //     }
 
-  // initial setting of current and total
-  setCurrentAndTotal(total,slides.length);
+  //     // hide all slides
+  //     slides.forEach((slide) => {
+  //       slide.classList.add("hide");
+  //       slide.classList.remove("show" ,"fade");
+  //     });
+  //     // show current slide
+  //     slides[slideIndex - 1].classList.remove("hide");
+  //     slides[slideIndex - 1].classList.add("show", "fade");
 
-  // showSlides(slideIndex);
-  prevBtn.addEventListener("click", () => {
-    changeSlidesN(-1);
-  });
-  nextBtn.addEventListener("click", () => {
-    changeSlidesN(1);
-  });
+  //     setCurrentAndTotal(current,slideIndex);
+  //   }
+  //   // initial call
+  //   function changeSlidesN(n) {
+  //     showSlides((slideIndex += n));
+  //   }
+  //   changeSlidesN(0)
 
-setZero(n)
-*/
+  //   // initial setting of current and total
+  //   setCurrentAndTotal(total,slides.length);
+
+  //   // showSlides(slideIndex);
+  //   prevBtn.addEventListener("click", () => {
+  //     changeSlidesN(-1);
+  //   });
+  //   nextBtn.addEventListener("click", () => {
+  //     changeSlidesN(1);
+  //   });
+
+  // setZero(n)
+
   //slider OLD version end
 });
